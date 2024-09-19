@@ -30,10 +30,6 @@ public class ReservaController {
 
 	@Autowired
 	private ReservaService reservaService;
-	@Autowired
-	private ClienteService clienteService;
-	@Autowired
-	private HabitacionService habitacionService;
 
 	@GetMapping
 	public List<Reserva> obtenerReservas() {

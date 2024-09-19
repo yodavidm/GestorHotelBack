@@ -40,24 +40,20 @@ public class ReservaService {
 	public Reserva crearReserva(ReservaDto reservaDto) {
 
         // Validar si el cliente existe
-        Cliente cliente = clienteRepository.findById(reservaDto.getId_cliente())
-                .orElseThrow(() -> new NoSuchElementException("Cliente no encontrado con id: " + reservaDto.getId_cliente()));
+        Cliente cliente = validarClienteEncontrado(reservaDto.getId_cliente());
 
         // Validar si la habitación existe
-        Habitacion habitacion = habitacionRepository.findById(reservaDto.getId_habitacion())
-                .orElseThrow(() -> new NoSuchElementException("Habitación no encontrada con id: " + reservaDto.getId_habitacion()));
+        Habitacion habitacion = validarHabitacionEncontrada(reservaDto.getId_habitacion());
 
         // Validar que la fecha de fin sea posterior a la fecha de inicio
         if (reservaDto.getFecha_fin().isBefore(reservaDto.getFecha_inicio())) {
             throw new IllegalArgumentException("La fecha de fin no puede ser anterior a la fecha de inicio");
         }
         
-        boolean ocupada = reservaRepository.existsByHabitacionAndFechas(habitacion.getId_habitacion(), reservaDto.getFecha_inicio(), reservaDto.getFecha_fin());
-        
-        if(ocupada) {
-        	logger.info("La habitacion " + habitacion.getId_habitacion() + " esta ocupada los dias: " + reservaDto.getFecha_inicio() + " hasta " + reservaDto.getFecha_fin());
-            throw new IllegalArgumentException("Esta ocupada");
-
+        // Comprobar si la habitación ya está ocupada en ese rango de fechas
+        if (validarExistenciaReservaHabitacionFecha(reservaDto.getId_habitacion(), reservaDto.getFecha_inicio(), reservaDto.getFecha_fin())) {
+            logger.info("La habitación {} está ocupada del {} al {}", habitacion.getId_habitacion(), reservaDto.getFecha_inicio(), reservaDto.getFecha_fin());
+            throw new IllegalArgumentException("La habitación está ocupada en las fechas solicitadas.");
         }
         
     	logger.info("La habitacion " + habitacion.getId_habitacion() + " esta libre los dias: " + reservaDto.getFecha_inicio() + " hasta " + reservaDto.getFecha_fin());
@@ -89,8 +85,7 @@ public class ReservaService {
 	    // Registrar la acción de cancelación (si se desea, opcional)
 	    logger.info("Cancelando la reserva con id: " + id + reserva.getHabitacion().getId_habitacion());
 
-	    // Eliminar la reserva
-	    
+	    // Actualizar estado de la reserva
 	    reserva.setEstado_reserva("Cancelada");
 	    reservaRepository.save(reserva);
 	    
@@ -107,6 +102,21 @@ public class ReservaService {
 	
 	public boolean existeReservaHabitacion(Long id_habitacion,LocalDate fechaInicio,LocalDate fechaFin) {
 		return reservaRepository.existsByHabitacionAndFechas(id_habitacion, fechaInicio, fechaFin);
+	}
+	
+	//metodos auxiliares para validar
+	public Cliente validarClienteEncontrado(Long id) {
+		return clienteRepository.findById(id)
+				.orElseThrow(()-> new NoSuchElementException("Cliente no encontrada con id: " + id));
+	}
+	
+	public Habitacion validarHabitacionEncontrada(Long id) {
+		return habitacionRepository.findById(id)
+				.orElseThrow(()->  new NoSuchElementException("Habitacion no encontrada con id: " + id));
+	}
+	
+	public boolean validarExistenciaReservaHabitacionFecha(Long idHabitacion,LocalDate fechaInicio,LocalDate fechaFin) {
+		return reservaRepository.existsByHabitacionAndFechas(idHabitacion, fechaInicio, fechaFin);
 	}
 	
 
