@@ -34,7 +34,7 @@ public class HabitacionService {
 				.estado_hab(EstadoHabitacion.LIBRE)
 				.build();
 
-		return habitacion;
+		return habitacionRepository.save(habitacion);
 	}
 
 	public Habitacion buscarHabitacion(Long id) {
