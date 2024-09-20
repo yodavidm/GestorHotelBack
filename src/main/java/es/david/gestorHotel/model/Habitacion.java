@@ -24,7 +24,7 @@ public class Habitacion {
 	private Long id_habitacion;
 	
 	@Column(name = "tipo_habitacion",nullable = false)
-	private String tipo_habitacion;
+	private TipoHabitacion tipo_habitacion;
 	
 	@Column(name = "numero",nullable = false,unique = true)
 	private int numero;
@@ -33,6 +33,14 @@ public class Habitacion {
 	private double precio;
 	
 	@Column(name = "estado_hab",nullable = false)
-	private String estado_hab;
+	private EstadoHabitacion estado_hab;
+	
+    public enum TipoHabitacion {
+        DOBLE, SINGLE, VIP
+    }
+    
+    public enum EstadoHabitacion {
+        LIBRE, OCUPADA, MANTENIMIENTO
+    }
 
 }

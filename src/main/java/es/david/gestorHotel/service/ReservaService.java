@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 import es.david.gestorHotel.dto.ReservaDto;
 import es.david.gestorHotel.model.Cliente;
 import es.david.gestorHotel.model.Habitacion;
+import es.david.gestorHotel.model.Habitacion.EstadoHabitacion;
 import es.david.gestorHotel.model.Reserva;
 import es.david.gestorHotel.repository.ClienteRepository;
 import es.david.gestorHotel.repository.HabitacionRepository;
@@ -61,7 +62,7 @@ public class ReservaService {
         
         
         //actualizamos estado de habitacion al crear la reserva
-        habitacion.setEstado_hab("Reservada");
+        habitacion.setEstado_hab(EstadoHabitacion.OCUPADA);
         habitacionRepository.save(habitacion);
 
         // Crear la reserva usando el builder
