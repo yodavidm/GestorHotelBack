@@ -21,6 +21,7 @@ import org.springframework.web.bind.annotation.RestController;
 import es.david.gestorHotel.dto.ReservaDto;
 import es.david.gestorHotel.model.Reserva;
 import es.david.gestorHotel.service.ClienteService;
+import es.david.gestorHotel.service.CorreoService;
 import es.david.gestorHotel.service.HabitacionService;
 import es.david.gestorHotel.service.ReservaService;
 
@@ -30,6 +31,9 @@ public class ReservaController {
 
 	@Autowired
 	private ReservaService reservaService;
+	
+	@Autowired
+	private CorreoService correoService;
 
 	@GetMapping
 	public List<Reserva> obtenerReservas() {
@@ -40,6 +44,10 @@ public class ReservaController {
 	public ResponseEntity<Reserva> crearReserva(@RequestBody ReservaDto reservaDto) {
 		try {
 			Reserva reserva = reservaService.crearReserva(reservaDto);
+			
+			//enviar correo 
+			correoService.enviarEmail(reserva.getCliente().getEmail(), "TU RESERVA " + reserva.getCliente().getNombre(), "Aquí tienes el recibo de tu reserva para el día " + reserva.getFecha_fin() + " hasta " + reserva.getFecha_fin());
+			
 			return ResponseEntity.ok(reserva);
 
 		} catch (NoSuchElementException e) {
